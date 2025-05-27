@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Todo List App</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script>
+    function confirmDelete(formId) {
+      if (confirm("Are you sure you want to delete this task?")) {
+        document.getElementById(formId).submit();
+      }
+    }
+    function dismissAlert() {
+      document.getElementById("alertBox").style.display = "none";
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Todo List</h1>
+
+    <% if (alert) { %>
+      <div id="alertBox" class="alert">
+        <span><%= alert %></span>
+        <button class="close-btn" onclick="dismissAlert()">&times;</button>
+      </div>
+    <% } %>
+
+    <form action="/tasks" method="POST" id="addTaskForm" class="add-task-form">
+      <input
+        type="text"
+        name="title"
+        placeholder="Add new task..."
+        autocomplete="off"
+        required
+      />
+      <select name="priority" aria-label="Select task priority">
+        <option value="low">Low Priority</option>
+        <option value="high">High Priority</option>
+        <option value="urgent">Urgent</option>
+      </select>
+      <button type="submit" class="btn primary-btn">
+        <i class="fa fa-plus"></i> Add Task
+      </button>
+    </form>
+
+    <ul class="task-list">
+      <% tasks.forEach(task => { %>
+        <li class="task-item <%= task.priority %>">
+          <form
+            action="/tasks/<%= task._id %>?_method=PUT"
+            method="POST"
+            class="edit-form"
+          >
+            <input
+              type="text"
+              name="title"
+              value="<%= task.title %>"
+              required
+              aria-label="Edit task title"
+            />
+            <select name="priority" aria-label="Edit task priority">
+              <option value="low" <%= task.priority === 'low' ? 'selected' : '' %>>
+                Low
+              </option>
+              <option value="high" <%= task.priority === 'high' ? 'selected' : '' %>>
+                High
+              </option>
+              <option
+                value="urgent"
+                <%= task.priority === 'urgent' ? 'selected' : '' %>
+              >
+                Urgent
+              </option>
+            </select>
+            <button
+              type="submit"
+              class="btn edit-btn"
+              title="Update Task"
+              aria-label="Update task"
+            >
+              <i class="fa fa-pencil"></i>
+            </button>
+          </form>
+
+          <form
+            id="deleteForm-<%= task._id %>"
+            action="/tasks/<%= task._id %>?_method=DELETE"
+            method="POST"
+            class="delete-form"
+          >
+            <button
+              type="button"
+              class="btn delete-btn"
+              title="Delete Task"
+              aria-label="Delete task"
+              onclick="confirmDelete('deleteForm-<%= task._id %>')"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+          </form>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+</body>
+</html>
